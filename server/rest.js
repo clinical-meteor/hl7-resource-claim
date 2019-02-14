@@ -56,11 +56,11 @@ JsonRoutes.sendResult = function (res, options) {
 
 
 //==========================================================================================
-// Step 1 - Create New Patient  
+// Step 1 - Create New Claim  
 
-JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, next) {
-  process.env.DEBUG && console.log('PUT /fhir-3.0.0/Patient/' + req.params.id);
-  //process.env.DEBUG && console.log('PUT /fhir-3.0.0/Patient/' + req.query._count);
+JsonRoutes.add("put", "/" + fhirVersion + "/Claim/:id", function (req, res, next) {
+  process.env.DEBUG && console.log('PUT /fhir-3.0.0/Claim/' + req.params.id);
+  //process.env.DEBUG && console.log('PUT /fhir-3.0.0/Claim/' + req.query._count);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -78,28 +78,28 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
 
 
       if (req.body) {
-        patientUpdate = req.body;
+        claimUpdate = req.body;
 
         // remove id and meta, if we're recycling a resource
         delete req.body.id;
         delete req.body.meta;
 
-        patientUpdate.resourceType = "Patient";
-        patientUpdate = Patients.toMongo(patientUpdate);
-        patientUpdate = Patients.prepForUpdate(patientUpdate);
+        claimUpdate.resourceType = "Claim";
+        claimUpdate = Claims.toMongo(claimUpdate);
+        claimUpdate = Claims.prepForUpdate(claimUpdate);
 
 
         process.env.DEBUG && console.log('-----------------------------------------------------------');
-        process.env.DEBUG && console.log('patientUpdate', JSON.stringify(patientUpdate, null, 2));
+        process.env.DEBUG && console.log('claimUpdate', JSON.stringify(claimUpdate, null, 2));
 
-        var patient = Patients.findOne(req.params.id);
-        var patientId;
+        var claim = Claims.findOne(req.params.id);
+        var claimId;
 
-        if(patient){
-          process.env.DEBUG && console.log('Patient found...')
-          patientId = Patients.update({_id: req.params.id}, {$set: patientUpdate },  function(error, result){
+        if(claim){
+          process.env.DEBUG && console.log('Claim found...')
+          claimId = Claims.update({_id: req.params.id}, {$set: claimUpdate },  function(error, result){
             if (error) {
-              process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
+              process.env.TRACE && console.log('PUT /fhir/Claim/' + req.params.id + "[error]", error);
 
               // Bad Request
               JsonRoutes.sendResult(res, {
@@ -108,15 +108,15 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
             }
             if (result) {
               process.env.TRACE && console.log('result', result);
-              res.setHeader("Patient", "fhir/Patient/" + result);
+              res.setHeader("Claim", "fhir/Claim/" + result);
               res.setHeader("Last-Modified", new Date());
               res.setHeader("ETag", "3.0.0");
 
-              var patients = Patients.find({_id: req.params.id});
+              var claims = Claims.find({_id: req.params.id});
               var payload = [];
 
-              patients.forEach(function(record){
-                payload.push(Patients.prepForFhirTransfer(record));
+              claims.forEach(function(record){
+                payload.push(Claims.prepForFhirTransfer(record));
               });
 
               console.log("payload", payload);
@@ -129,11 +129,11 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
             }
           });
         } else {        
-          process.env.DEBUG && console.log('No patient found.  Creating one.');
-          patientUpdate._id = req.params.id;
-          patientId = Patients.insert(patientUpdate,  function(error, result){
+          process.env.DEBUG && console.log('No claim found.  Creating one.');
+          claimUpdate._id = req.params.id;
+          claimId = Claims.insert(claimUpdate,  function(error, result){
             if (error) {
-              process.env.TRACE && console.log('PUT /fhir/Patient/' + req.params.id + "[error]", error);
+              process.env.TRACE && console.log('PUT /fhir/Claim/' + req.params.id + "[error]", error);
 
               // Bad Request
               JsonRoutes.sendResult(res, {
@@ -142,15 +142,15 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
             }
             if (result) {
               process.env.TRACE && console.log('result', result);
-              res.setHeader("Patient", "fhir/Patient/" + result);
+              res.setHeader("Claim", "fhir/Claim/" + result);
               res.setHeader("Last-Modified", new Date());
               res.setHeader("ETag", "3.0.0");
 
-              var patients = Patients.find({_id: req.params.id});
+              var claims = Claims.find({_id: req.params.id});
               var payload = [];
 
-              patients.forEach(function(record){
-                payload.push(Patients.prepForFhirTransfer(record));
+              claims.forEach(function(record){
+                payload.push(Claims.prepForFhirTransfer(record));
               });
 
               console.log("payload", payload);
@@ -190,10 +190,10 @@ JsonRoutes.add("put", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
 
 
 //==========================================================================================
-// Step 2 - Read Patient  
+// Step 2 - Read Claim  
 
-JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id", function (req, res, next) {
-  process.env.DEBUG && console.log('GET /fhir-3.0.0/Patient/' + req.params.id);
+JsonRoutes.add("get", "/" + fhirVersion + "/Claim/:id", function (req, res, next) {
+  process.env.DEBUG && console.log('GET /fhir-3.0.0/Claim/' + req.params.id);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -209,19 +209,19 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
         process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
       }
 
-      var patientData = Patients.findOne({_id: req.params.id});
-      if (patientData) {
-        patientData.id = patientData._id;
+      var claimData = Claims.findOne({_id: req.params.id});
+      if (claimData) {
+        claimData.id = claimData._id;
 
-        delete patientData._document;
-        delete patientData._id;
+        delete claimData._document;
+        delete claimData._id;
 
-        process.env.TRACE && console.log('patientData', patientData);
+        process.env.TRACE && console.log('claimData', claimData);
 
         // Success
         JsonRoutes.sendResult(res, {
           code: 200,
-          data: Patients.prepForFhirTransfer(patientData)
+          data: Claims.prepForFhirTransfer(claimData)
         });
       } else {
         // Gone
@@ -244,10 +244,10 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id", function (req, res, ne
 });
 
 //==========================================================================================
-// Step 3 - Update Patient  
+// Step 3 - Update Claim  
 
-JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next) {
-  process.env.DEBUG && console.log('POST /fhir/Patient/', JSON.stringify(req.body, null, 2));
+JsonRoutes.add("post", "/" + fhirVersion + "/Claim", function (req, res, next) {
+  process.env.DEBUG && console.log('POST /fhir/Claim/', JSON.stringify(req.body, null, 2));
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -263,34 +263,34 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
         process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
       }
 
-      var patientId;
-      var newPatient;
+      var claimId;
+      var newClaim;
 
       if (req.body) {
-        newPatient = req.body;
+        newClaim = req.body;
 
 
         // remove id and meta, if we're recycling a resource
-        delete newPatient.id;
-        delete newPatient.meta;
+        delete newClaim.id;
+        delete newClaim.meta;
 
 
-        newPatient = Patients.toMongo(newPatient);
+        newClaim = Claims.toMongo(newClaim);
 
-        process.env.TRACE && console.log('newPatient', JSON.stringify(newPatient, null, 2));
-        // process.env.DEBUG && console.log('newPatient', newPatient);
+        process.env.TRACE && console.log('newClaim', JSON.stringify(newClaim, null, 2));
+        // process.env.DEBUG && console.log('newClaim', newClaim);
 
-        console.log('Cleaning new patient...')
-        PatientSchema.clean(newPatient);
+        console.log('Cleaning new claim...')
+        ClaimSchema.clean(newClaim);
 
-        var practionerContext = PatientSchema.newContext();
-        practionerContext.validate(newPatient)
-        console.log('New patient is valid:', practionerContext.isValid());
-        console.log('check', check(newPatient, PatientSchema))
+        var practionerContext = ClaimSchema.newContext();
+        practionerContext.validate(newClaim)
+        console.log('New claim is valid:', practionerContext.isValid());
+        console.log('check', check(newClaim, ClaimSchema))
         
 
 
-        var patientId = Patients.insert(newPatient,  function(error, result){
+        var claimId = Claims.insert(newClaim,  function(error, result){
           if (error) {
             process.env.TRACE && console.log('error', error);
 
@@ -301,15 +301,15 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
           }
           if (result) {
             process.env.TRACE && console.log('result', result);
-            res.setHeader("Patient", "fhir-3.0.0/Patient/" + result);
+            res.setHeader("Claim", "fhir-3.0.0/Claim/" + result);
             res.setHeader("Last-Modified", new Date());
             res.setHeader("ETag", "3.0.0");
 
-            var patients = Patients.find({_id: result});
+            var claims = Claims.find({_id: result});
             var payload = [];
 
-            patients.forEach(function(record){
-              payload.push(Patients.prepForFhirTransfer(record));
+            claims.forEach(function(record){
+              payload.push(Claims.prepForFhirTransfer(record));
             });
 
             //console.log("payload", payload);
@@ -320,7 +320,7 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
             });
           }
         });
-        console.log('patientId', patientId);
+        console.log('claimId', claimId);
       } else {
         // Unprocessable Entity
         JsonRoutes.sendResult(res, {
@@ -343,11 +343,11 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient", function (req, res, next)
 });
 
 //==========================================================================================
-// Step 4 - PatientHistoryInstance
+// Step 4 - ClaimHistoryInstance
 
-JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history", function (req, res, next) {
-  process.env.DEBUG && console.log('GET /fhir-3.0.0/Patient/', req.params);
-  process.env.DEBUG && console.log('GET /fhir-3.0.0/Patient/', req.query._count);
+JsonRoutes.add("get", "/" + fhirVersion + "/Claim/:id/_history", function (req, res, next) {
+  process.env.DEBUG && console.log('GET /fhir-3.0.0/Claim/', req.params);
+  process.env.DEBUG && console.log('GET /fhir-3.0.0/Claim/', req.query._count);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -363,18 +363,18 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history", function (req
         process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
       }
 
-      var patients = Patients.find({_id: req.params.id});
+      var claims = Claims.find({_id: req.params.id});
       var payload = [];
 
-      patients.forEach(function(record){
-        payload.push(Patients.prepForFhirTransfer(record));
+      claims.forEach(function(record){
+        payload.push(Claims.prepForFhirTransfer(record));
 
-        // the following is a hack, to conform to the Touchstone Patient testscript
-        // https://touchstone.aegis.net/touchstone/testscript?id=06313571dea23007a12ec7750a80d98ca91680eca400b5215196cd4ae4dcd6da&name=%2fFHIR1-6-0-Basic%2fP-R%2fPatient%2fClient+Assigned+Id%2fPatient-client-id-json&version=1&latestVersion=1&itemId=&spec=HL7_FHIR_STU3_C2
+        // the following is a hack, to conform to the Touchstone Claim testscript
+        // https://touchstone.aegis.net/touchstone/testscript?id=06313571dea23007a12ec7750a80d98ca91680eca400b5215196cd4ae4dcd6da&name=%2fFHIR1-6-0-Basic%2fP-R%2fClaim%2fClient+Assigned+Id%2fClaim-client-id-json&version=1&latestVersion=1&itemId=&spec=HL7_FHIR_STU3_C2
         // the _history query expects a different resource in the Bundle for each version of the file in the system
         // since we don't implement record versioning in Meteor on FHIR yet
         // we are simply adding two instances of the record to the payload 
-        payload.push(Patients.prepForFhirTransfer(record));
+        payload.push(Claims.prepForFhirTransfer(record));
       });
       // Success
       JsonRoutes.sendResult(res, {
@@ -396,13 +396,13 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history", function (req
 });
 
 //==========================================================================================
-// Step 5 - Patient Version Read
+// Step 5 - Claim Version Read
 
 // NOTE:  We've not implemented _history functionality yet; so this endpoint is mostly a duplicate of Step 2.
 
-JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history/:versionId", function (req, res, next) {
-  process.env.DEBUG && console.log('GET /fhir-3.0.0/Patient/:id/_history/:versionId', req.params);
-  //process.env.DEBUG && console.log('GET /fhir-3.0.0/Patient/:id/_history/:versionId', req.query._count);
+JsonRoutes.add("get", "/" + fhirVersion + "/Claim/:id/_history/:versionId", function (req, res, next) {
+  process.env.DEBUG && console.log('GET /fhir-3.0.0/Claim/:id/_history/:versionId', req.params);
+  //process.env.DEBUG && console.log('GET /fhir-3.0.0/Claim/:id/_history/:versionId', req.query._count);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -426,19 +426,19 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient/:id/_history/:versionId", fu
       process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
     }
 
-    var patientData = Patients.findOne({_id: req.params.id});
-    if (patientData) {
+    var claimData = Claims.findOne({_id: req.params.id});
+    if (claimData) {
       
-      patientData.id = patientData._id;
+      claimData.id = claimData._id;
 
-      delete patientData._document;
-      delete patientData._id;
+      delete claimData._document;
+      delete claimData._id;
 
-      process.env.TRACE && console.log('patientData', patientData);
+      process.env.TRACE && console.log('claimData', claimData);
 
       JsonRoutes.sendResult(res, {
         code: 200,
-        data: Patients.prepForFhirTransfer(patientData)
+        data: Claims.prepForFhirTransfer(claimData)
       });
     } else {
       JsonRoutes.sendResult(res, {
@@ -510,8 +510,8 @@ generateDatabaseQuery = function(query){
   return databaseQuery;
 }
 
-JsonRoutes.add("get", "/" + fhirVersion + "/Patient", function (req, res, next) {
-  process.env.DEBUG && console.log('GET /fhir-3.0.0/Patient', req.query);
+JsonRoutes.add("get", "/" + fhirVersion + "/Claim", function (req, res, next) {
+  process.env.DEBUG && console.log('GET /fhir-3.0.0/Claim', req.query);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -530,10 +530,10 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient", function (req, res, next) 
       var databaseQuery = generateDatabaseQuery(req.query);
 
       var payload = [];
-      var patients = Patients.find(databaseQuery);
+      var claims = Claims.find(databaseQuery);
 
-      patients.forEach(function(record){
-        payload.push(Patients.prepForFhirTransfer(record));
+      claims.forEach(function(record){
+        payload.push(Claims.prepForFhirTransfer(record));
       });
 
       // Success
@@ -556,10 +556,10 @@ JsonRoutes.add("get", "/" + fhirVersion + "/Patient", function (req, res, next) 
 });
 
 //==========================================================================================
-// Step 6 - Patient Search Type  
+// Step 6 - Claim Search Type  
 
-JsonRoutes.add("post", "/" + fhirVersion + "/Patient/:param", function (req, res, next) {
-  process.env.DEBUG && console.log('POST /fhir-3.0.0/Patient/' + JSON.stringify(req.query));
+JsonRoutes.add("post", "/" + fhirVersion + "/Claim/:param", function (req, res, next) {
+  process.env.DEBUG && console.log('POST /fhir-3.0.0/Claim/' + JSON.stringify(req.query));
 
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("content-type", "application/fhir+json; charset=utf-8");
@@ -575,7 +575,7 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient/:param", function (req, res
         process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
       }
 
-      var patients = [];
+      var claims = [];
 
       if (req.params.param.includes('_search')) {
         var searchLimit = 1;
@@ -586,16 +586,16 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient/:param", function (req, res
         var databaseQuery = generateDatabaseQuery(req.query);
         process.env.DEBUG && console.log('databaseQuery', databaseQuery);
 
-        patients = Patients.find(databaseQuery, {limit: searchLimit});
+        claims = Claims.find(databaseQuery, {limit: searchLimit});
 
         var payload = [];
 
-        patients.forEach(function(record){
-          payload.push(Patients.prepForFhirTransfer(record));
+        claims.forEach(function(record){
+          payload.push(Claims.prepForFhirTransfer(record));
         });
       }
 
-      //process.env.TRACE && console.log('patients', patients);
+      //process.env.TRACE && console.log('claims', claims);
 
       // Success
       JsonRoutes.sendResult(res, {
@@ -620,10 +620,10 @@ JsonRoutes.add("post", "/" + fhirVersion + "/Patient/:param", function (req, res
 
 
 //==========================================================================================
-// Step 7 - Patient Delete    
+// Step 7 - Claim Delete    
 
-JsonRoutes.add("delete", "/" + fhirVersion + "/Patient/:id", function (req, res, next) {
-  process.env.DEBUG && console.log('DELETE /fhir-3.0.0/Patient/' + req.params.id);
+JsonRoutes.add("delete", "/" + fhirVersion + "/Claim/:id", function (req, res, next) {
+  process.env.DEBUG && console.log('DELETE /fhir-3.0.0/Claim/' + req.params.id);
 
   res.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -638,13 +638,13 @@ JsonRoutes.add("delete", "/" + fhirVersion + "/Patient/:id", function (req, res,
         process.env.TRACE && console.log('accessToken.userId', accessToken.userId);
       }
 
-      if (Patients.find({_id: req.params.id}).count() === 0) {
+      if (Claims.find({_id: req.params.id}).count() === 0) {
         // No Content
         JsonRoutes.sendResult(res, {
           code: 204
         });
       } else {
-        Patients.remove({_id: req.params.id}, function(error, result){
+        Claims.remove({_id: req.params.id}, function(error, result){
           if (result) {
             // No Content
             JsonRoutes.sendResult(res, {
@@ -681,7 +681,7 @@ JsonRoutes.add("delete", "/" + fhirVersion + "/Patient/:id", function (req, res,
 
 
 
-// WebApp.connectHandlers.use("/fhir/Patient", function(req, res, next) {
+// WebApp.connectHandlers.use("/fhir/Claim", function(req, res, next) {
 //   res.setHeader("Access-Control-Allow-Origin", "*");
 //   return next();
 // });

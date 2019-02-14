@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'clinical:hl7-resource-patient',
+  name: 'clinical:hl7-resource-claim',
   version: '3.4.18',
-  summary: 'HL7 FHIR Resource - Patient',
-  git: 'https://github.com/clinical-meteor/hl7-resource-patient',
+  summary: 'HL7 FHIR Resource - Claim',
+  git: 'https://github.com/clinical-meteor/hl7-resource-claim',
   documentation: 'README.md'
 });
 
@@ -33,7 +33,7 @@ Package.onUse(function (api) {
   
   api.imply('clinical:user-model');
 
-  api.addFiles('lib/Patients.js');
+  api.addFiles('lib/Claims.js');
 
   api.addFiles('server/methods.js', 'server');
   api.addFiles('server/rest.js', 'server');
@@ -43,9 +43,9 @@ Package.onUse(function (api) {
     api.use('clinical:fhir-vault-server@0.0.3', ['client', 'server'], {weak: true});
   }
   
-  api.export('Patient');
-  api.export('Patients');
-  api.export('PatientSchema');
+  api.export('Claim');
+  api.export('Claims');
+  api.export('ClaimSchema');
 
   api.addFiles('assets/noAvatar.png', "client", {isAsset: true});    
 

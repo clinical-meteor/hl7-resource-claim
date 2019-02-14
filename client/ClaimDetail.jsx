@@ -36,13 +36,13 @@ const styles = {
   },
 };
 
-export class PatientDetail extends React.Component {
+export class ClaimDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      patientId: false,
-      patient: {
-        resourceType : 'Patient',
+      claimId: false,
+      claim: {
+        resourceType : 'Claim',
         name : [{
           text : '',
           prefix: [''],
@@ -108,40 +108,40 @@ export class PatientDetail extends React.Component {
       }
     }
   }
-  dehydrateFhirResource(patient) {
+  dehydrateFhirResource(claim) {
     let formData = Object.assign({}, this.state.form);
 
-    formData.prefix = get(patient, 'name[0].prefix[0]')
-    formData.family = get(patient, 'name[0].family[0]')
-    formData.given = get(patient, 'name[0].given[0]')
-    formData.suffix = get(patient, 'name[0].suffix[0]')
-    formData.identifier = get(patient, 'identifier[0].value')
-    formData.deceased = get(patient, 'deceasedBoolean')
-    formData.gender = get(patient, 'gender')
-    formData.multipleBirth = get(patient, 'multipleBirthBoolean')
-    formData.maritalStatus = get(patient, 'maritalStatus.text')
-    formData.species = get(patient, 'animal.species.text')
-    formData.language = get(patient, 'communication[0].language.text')
-    formData.birthDate = moment(patient.birthDate).format("YYYY-MM-DD")
+    formData.prefix = get(claim, 'name[0].prefix[0]')
+    formData.family = get(claim, 'name[0].family[0]')
+    formData.given = get(claim, 'name[0].given[0]')
+    formData.suffix = get(claim, 'name[0].suffix[0]')
+    formData.identifier = get(claim, 'identifier[0].value')
+    formData.deceased = get(claim, 'deceasedBoolean')
+    formData.gender = get(claim, 'gender')
+    formData.multipleBirth = get(claim, 'multipleBirthBoolean')
+    formData.maritalStatus = get(claim, 'maritalStatus.text')
+    formData.species = get(claim, 'animal.species.text')
+    formData.language = get(claim, 'communication[0].language.text')
+    formData.birthDate = moment(claim.birthDate).format("YYYY-MM-DD")
 
     return formData;
   }
   shouldComponentUpdate(nextProps){
-    process.env.NODE_ENV === "test" && console.log('PatientDetail.shouldComponentUpdate()', nextProps, this.state)
+    process.env.NODE_ENV === "test" && console.log('ClaimDetail.shouldComponentUpdate()', nextProps, this.state)
     let shouldUpdate = true;
 
     // both false; don't take any more updates
-    if(nextProps.patient === this.state.patient){
+    if(nextProps.claim === this.state.claim){
       shouldUpdate = false;
     }
 
-    // received an patient from the table; okay lets update again
-    if(nextProps.patientId !== this.state.patientId){
-      this.setState({patientId: nextProps.patientId})
+    // received an claim from the table; okay lets update again
+    if(nextProps.claimId !== this.state.claimId){
+      this.setState({claimId: nextProps.claimId})
       
-      if(nextProps.patient){
-        this.setState({patient: nextProps.patient})     
-        this.setState({form: this.dehydrateFhirResource(nextProps.patient)})       
+      if(nextProps.claim){
+        this.setState({claim: nextProps.claim})     
+        this.setState({form: this.dehydrateFhirResource(nextProps.claim)})       
       }
       shouldUpdate = true;
     }
@@ -150,28 +150,28 @@ export class PatientDetail extends React.Component {
   }
   getMeteorData() {
     let data = {
-      patientId: this.props.patientId,
-      patient: false,
+      claimId: this.props.claimId,
+      claim: false,
       form: this.state.form
     };
 
-    if(this.props.patient){
-      data.patient = this.props.patient;
+    if(this.props.claim){
+      data.claim = this.props.claim;
     }
     if(this.props.displayBirthdate){
       data.displayBirthdate = this.props.displayBirthdate;
     }
 
-    if(process.env.NODE_ENV === "test") console.log("PatientDetail[data]", data);
+    if(process.env.NODE_ENV === "test") console.log("ClaimDetail[data]", data);
     return data;
   }
 
   render() {
-    if(process.env.NODE_ENV === "test") console.log('PatientDetail.render()', this.state)
+    if(process.env.NODE_ENV === "test") console.log('ClaimDetail.render()', this.state)
     let formData = this.state.form;
 
     return (
-      <div id={this.props.id} className="patientDetail">
+      <div id={this.props.id} className="claimDetail">
         <CardText>
           <Row>
             <Col md={4}>
@@ -351,7 +351,7 @@ export class PatientDetail extends React.Component {
 
         </CardText>
         <CardActions>
-          { this.determineButtons(this.data.patientId) }
+          { this.determineButtons(this.data.claimId) }
         </CardActions>
       </div>
     );
@@ -386,23 +386,23 @@ export class PatientDetail extends React.Component {
       );
     }
   }
-  determineButtons(patientId){
-    if (patientId) {
+  determineButtons(claimId){
+    if (claimId) {
       return (
         <div>
-          <RaisedButton id='updatePatientButton' className='updatePatientButton' label="Save" primary={true} onClick={this.handleSaveButton.bind(this)} style={{marginRight: '20px'}} />
-          <RaisedButton id='deletePatientButton' label="Delete" onClick={this.handleDeleteButton.bind(this)} />
+          <RaisedButton id='updateClaimButton' className='updateClaimButton' label="Save" primary={true} onClick={this.handleSaveButton.bind(this)} style={{marginRight: '20px'}} />
+          <RaisedButton id='deleteClaimButton' label="Delete" onClick={this.handleDeleteButton.bind(this)} />
         </div>
       );
     } else {
       return(
-        <RaisedButton id='savePatientButton'  className='savePatientButton' label="Save" primary={true} onClick={this.handleSaveButton.bind(this)} />
+        <RaisedButton id='saveClaimButton'  className='saveClaimButton' label="Save" primary={true} onClick={this.handleSaveButton.bind(this)} />
       );
     }
   }
 
   updateFormData(formData, field, textValue){
-    if(process.env.NODE_ENV === "test") console.log("PatientDetail.updateFormData", formData, field, textValue);
+    if(process.env.NODE_ENV === "test") console.log("ClaimDetail.updateFormData", formData, field, textValue);
 
     switch (field) {
       case "prefix":
@@ -450,67 +450,67 @@ export class PatientDetail extends React.Component {
     if(process.env.NODE_ENV === "test") console.log("formData", formData);
     return formData;
   }
-  updatePatient(patientData, field, textValue){
-    if(process.env.NODE_ENV === "test") console.log("PatientDetail.updatePatient", patientData, field, textValue);
+  updateClaim(claimData, field, textValue){
+    if(process.env.NODE_ENV === "test") console.log("ClaimDetail.updateClaim", claimData, field, textValue);
 
     switch (field) {
       case "prefix":
-        set(patientData, 'name[0].prefix[0]', textValue)
+        set(claimData, 'name[0].prefix[0]', textValue)
         break;
       case "family":
-        set(patientData, 'name[0].family[0]', textValue)
+        set(claimData, 'name[0].family[0]', textValue)
         break;
       case "given":
-        set(patientData, 'name[0].given[0]', textValue)
+        set(claimData, 'name[0].given[0]', textValue)
         break;        
       case "suffix":
-        set(patientData, 'name[0].suffix[0]', textValue)
+        set(claimData, 'name[0].suffix[0]', textValue)
         break;
       case "identifier":
-        set(patientData, 'identifier[0].value', textValue)
+        set(claimData, 'identifier[0].value', textValue)
         break;
       case "deceased":
-        set(patientData, 'deceasedBoolean', textValue)
+        set(claimData, 'deceasedBoolean', textValue)
         break;
       case "multipleBirth":
-        set(patientData, 'multipleBirthBoolean', textValue)
+        set(claimData, 'multipleBirthBoolean', textValue)
         break;
       case "gender":
-        set(patientData, 'gender', textValue)
+        set(claimData, 'gender', textValue)
         break;
       case "maritalStatus":
-        set(patientData, 'maritalStatus.text', textValue)
+        set(claimData, 'maritalStatus.text', textValue)
         break;
       case "species":
-        set(patientData, 'animal.species.text', textValue)
+        set(claimData, 'animal.species.text', textValue)
         break;
       case "language":
-        set(patientData, 'communication[0].language.text', textValue)
+        set(claimData, 'communication[0].language.text', textValue)
         break;  
       case "photo":
-        set(patientData, 'photo[0].url', textValue)
+        set(claimData, 'photo[0].url', textValue)
         break;
       case "birthDate":
-        set(patientData, 'birthDate', textValue)
+        set(claimData, 'birthDate', textValue)
         break;
     }
-    return patientData;
+    return claimData;
   }
   changeState(field, event, textValue){
     if(process.env.NODE_ENV === "test") console.log("   ");
-    if(process.env.NODE_ENV === "test") console.log("PatientDetail.changeState", field, textValue);
+    if(process.env.NODE_ENV === "test") console.log("ClaimDetail.changeState", field, textValue);
     if(process.env.NODE_ENV === "test") console.log("this.state", this.state);
 
     let formData = Object.assign({}, this.state.form);
-    let patientData = Object.assign({}, this.state.patient);
+    let claimData = Object.assign({}, this.state.claim);
 
     formData = this.updateFormData(formData, field, textValue);
-    patientData = this.updatePatient(patientData, field, textValue);
+    claimData = this.updateClaim(claimData, field, textValue);
 
-    if(process.env.NODE_ENV === "test") console.log("patientData", patientData);
+    if(process.env.NODE_ENV === "test") console.log("claimData", claimData);
     if(process.env.NODE_ENV === "test") console.log("formData", formData);
 
-    this.setState({patient: patientData})
+    this.setState({claim: claimData})
     this.setState({form: formData})
   }
 
@@ -518,85 +518,85 @@ export class PatientDetail extends React.Component {
   // this could be a mixin
   handleSaveButton(){
     if(process.env.NODE_ENV === "test") console.log('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&&')
-    console.log('Saving a new Patient...', this.state)
+    console.log('Saving a new Claim...', this.state)
 
     let self = this;
-    let fhirPatientData = Object.assign({}, this.state.patient);
+    let fhirClaimData = Object.assign({}, this.state.claim);
 
-    if(process.env.NODE_ENV === "test") console.log('fhirPatientData', fhirPatientData);
+    if(process.env.NODE_ENV === "test") console.log('fhirClaimData', fhirClaimData);
 
 
-    let patientValidator = PatientSchema.newContext();
-    console.log('patientValidator', patientValidator)
-    patientValidator.validate(fhirPatientData)
+    let claimValidator = ClaimSchema.newContext();
+    console.log('claimValidator', claimValidator)
+    claimValidator.validate(fhirClaimData)
 
-    console.log('IsValid: ', patientValidator.isValid())
-    // console.log('ValidationErrors: ', patientValidator.validationErrors());
+    console.log('IsValid: ', claimValidator.isValid())
+    // console.log('ValidationErrors: ', claimValidator.validationErrors());
 
-    if (this.state.patientId) {
-      if(process.env.NODE_ENV === "test") console.log("Updating patient...");
+    if (this.state.claimId) {
+      if(process.env.NODE_ENV === "test") console.log("Updating claim...");
 
-      delete fhirPatientData._id;
+      delete fhirClaimData._id;
 
       // not sure why we're having to respecify this; fix for a bug elsewhere
-      fhirPatientData.resourceType = 'Patient';
+      fhirClaimData.resourceType = 'Claim';
 
-      Patients._collection.update({_id: this.state.patientId}, {$set: fhirPatientData }, function(error, result){
+      Claims._collection.update({_id: this.state.claimId}, {$set: fhirClaimData }, function(error, result){
         if (error) {
-          if(process.env.NODE_ENV === "test") console.log("Patients.insert[error]", error);
+          if(process.env.NODE_ENV === "test") console.log("Claims.insert[error]", error);
           Bert.alert(error.reason, 'danger');
         }
         if (result) {
-          HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: self.state.patientId});
-          Session.set('selectedPatientId', false);
-          Session.set('patientPageTabIndex', 1);
-          Bert.alert('Patient added!', 'success');
+          HipaaLogger.logEvent({eventType: "update", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Claims", recordId: self.state.claimId});
+          Session.set('selectedClaimId', false);
+          Session.set('claimPageTabIndex', 1);
+          Bert.alert('Claim added!', 'success');
         }
       });
     } else {
-      if(process.env.NODE_ENV === "test") console.log("Creating a new patient...", fhirPatientData);
+      if(process.env.NODE_ENV === "test") console.log("Creating a new claim...", fhirClaimData);
 
-      Patients._collection.insert(fhirPatientData, function(error, result) {
+      Claims._collection.insert(fhirClaimData, function(error, result) {
         if (error) {
-          if(process.env.NODE_ENV === "test")  console.log('Patients.insert[error]', error);
+          if(process.env.NODE_ENV === "test")  console.log('Claims.insert[error]', error);
           Bert.alert(error.reason, 'danger');
         }
         if (result) {
-          HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: self.state.patientId});
-          Session.set('patientPageTabIndex', 1);
-          Session.set('selectedPatientId', false);
-          Bert.alert('Patient added!', 'success');
+          HipaaLogger.logEvent({eventType: "create", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Claims", recordId: self.state.claimId});
+          Session.set('claimPageTabIndex', 1);
+          Session.set('selectedClaimId', false);
+          Bert.alert('Claim added!', 'success');
         }
       });
     }
   }
 
   handleCancelButton(){
-    Session.set('patientPageTabIndex', 1);
+    Session.set('claimPageTabIndex', 1);
   }
 
   handleDeleteButton(){
     let self = this;
-    Patients._collection.animalremove({_id: this.state.patientId}, function(error, result){
+    Claims._collection.animalremove({_id: this.state.claimId}, function(error, result){
       if (error) {
-        if(process.env.NODE_ENV === "test") console.log('Patients.insert[error]', error);
+        if(process.env.NODE_ENV === "test") console.log('Claims.insert[error]', error);
         Bert.alert(error.reason, 'danger');
       }
       if (result) {
-        HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Patients", recordId: self.state.patientId});
-        Session.set('patientPageTabIndex', 1);
-        Session.set('selectedPatientId', false);
-        Bert.alert('Patient removed!', 'success');
+        HipaaLogger.logEvent({eventType: "delete", userId: Meteor.userId(), userName: Meteor.user().fullName(), collectionName: "Claims", recordId: self.state.claimId});
+        Session.set('claimPageTabIndex', 1);
+        Session.set('selectedClaimId', false);
+        Bert.alert('Claim removed!', 'success');
       }
     });
   }
 }
 
-PatientDetail.propTypes = {
+ClaimDetail.propTypes = {
   id: PropTypes.string,
   fhirVersion: PropTypes.string,
-  patientId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  patient: PropTypes.oneOfType([PropTypes.object, PropTypes.bool])
+  claimId: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  claim: PropTypes.oneOfType([PropTypes.object, PropTypes.bool])
 };
-ReactMixin(PatientDetail.prototype, ReactMeteorData);
-export default PatientDetail;
+ReactMixin(ClaimDetail.prototype, ReactMeteorData);
+export default ClaimDetail;

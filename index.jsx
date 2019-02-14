@@ -1,30 +1,30 @@
 
 
-// import PatientDetail from './client/react/PatientDetail.js';
-// import PatientPickList from './client/react/PatientPickList.js';
-// import PatientsPage from './client/react/PatientsPage.js';
-// import PatientTable from './client/react/PatientTable.js';
-// import { insertPatient, removePatientById, updatePatient } from './lib/methods.js';
+// import ClaimDetail from './client/ClaimDetail.js';
+// import ClaimPickList from './client/ClaimPickList.js';
+// import ClaimsPage from './client/ClaimsPage.js';
+// import ClaimTable from './client/ClaimTable.js';
+// import { insertClaim, removeClaimById, updateClaim } from './lib/methods.js';
 
-import PatientsPage from './client/react/PatientsPage';
-import PatientTable from './client/react/PatientTable';
-import {PatientTable as PatientsTable} from './client/react/PatientTable';
-import PatientDetail from './client/react/PatientDetail';
-import PatientCard from './client/react/PatientCard';
+import ClaimsPage from './client/ClaimsPage';
+import ClaimTable from './client/ClaimTable';
+import {ClaimTable as ClaimsTable} from './client/ClaimTable';
+import ClaimDetail from './client/ClaimDetail';
+import ClaimCard from './client/ClaimCard';
 
-import { Patient, Patients, PatientSchema } from './lib/Patients';
+import { Claim, Claims, ClaimSchema } from './lib/Claims';
 
 var DynamicRoutes = [{
-  'name': 'PatientPage',
+  'name': 'ClaimPage',
   'path': '/patients',
-  'component': PatientsPage,
+  'component': ClaimsPage,
   'requireAuth': true
 }];
 
 // var DynamicRoutes = [];
 
 var SidebarElements = [{
-  'primaryText': 'Patients',
+  'primaryText': 'Claims',
   'to': '/patients',
   'href': '/patients'
 }];
@@ -33,15 +33,15 @@ export {
   SidebarElements, 
   DynamicRoutes, 
 
-  PatientsPage,
-  PatientTable,
-  PatientsTable,
-  PatientDetail,
-  PatientCard,
+  ClaimsPage,
+  ClaimTable,
+  ClaimsTable,
+  ClaimDetail,
+  ClaimCard,
 
-  Patient,
-  Patients,
-  PatientSchema
+  Claim,
+  Claims,
+  ClaimSchema
 };
 
 

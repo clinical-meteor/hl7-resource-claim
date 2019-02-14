@@ -10,7 +10,7 @@ import { has, get } from 'lodash';
 import { TableNoData } from 'meteor/clinical:glass-ui'
 import PropTypes from 'prop-types';
 
-flattenPatient = function(person){
+flattenClaim = function(person){
   let result = {
     _id: person._id,
     id: person.id,
@@ -54,7 +54,7 @@ flattenPatient = function(person){
   return result;
 }
 
-export class PatientTable extends React.Component {
+export class ClaimTable extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -84,7 +84,7 @@ export class PatientTable extends React.Component {
         }
       },
       selected: [],
-      patients: []
+      claims: []
     };
 
     let query = {};
@@ -103,13 +103,13 @@ export class PatientTable extends React.Component {
       // console.log('this.props.data', this.props.data);
 
       if(this.props.data.length > 0){              
-        this.props.data.forEach(function(patient){
-          data.patients.push(flattenPatient(patient));
+        this.props.data.forEach(function(claim){
+          data.claims.push(flattenClaim(claim));
         });  
       }
     } else {
-      data.patients = Patients.find().map(function(patient){
-        return flattenPatient(patient);
+      data.claims = Claims.find().map(function(claim){
+        return flattenClaim(claim);
       });
     }
 
@@ -126,16 +126,16 @@ export class PatientTable extends React.Component {
       data.style.cellHideOnPhone.display = 'table-cell';
     }
 
-    // console.log("PatientTable[data]", data);
+    // console.log("ClaimTable[data]", data);
     return data;
   }
   imgError(avatarId) {
     this.refs[avatarId].src = Meteor.absoluteUrl() + 'noAvatar.png';
   }
   rowClick(id){
-    Session.set('patientsUpsert', false);
-    Session.set('selectedPatientId', id);
-    Session.set('patientPageTabIndex', 2);
+    Session.set('claimsUpsert', false);
+    Session.set('selectedClaimId', id);
+    Session.set('claimPageTabIndex', 2);
   }
   renderRowAvatarHeader(){
     if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
@@ -144,13 +144,13 @@ export class PatientTable extends React.Component {
       );
     }
   }
-  renderRowAvatar(patient, avatarStyle){
-    //console.log('renderRowAvatar', patient, avatarStyle)
+  renderRowAvatar(claim, avatarStyle){
+    //console.log('renderRowAvatar', claim, avatarStyle)
     
     if (get(Meteor, 'settings.public.defaults.avatars') && (this.props.showAvatars === true)) {
       return (
         <td className='avatar'>
-          <img src={patient.photo} ref={patient._id} onError={ this.imgError.bind(this, patient._id) } style={avatarStyle}/>
+          <img src={claim.photo} ref={claim._id} onError={ this.imgError.bind(this, claim._id) } style={avatarStyle}/>
         </td>
       );
     }
@@ -162,11 +162,11 @@ export class PatientTable extends React.Component {
       );
     }
   }
-  renderSpeciesRow(displaySpecies, patient){
+  renderSpeciesRow(displaySpecies, claim){
     if(displaySpecies){
       return (
         <td className='species' style={this.data.style.cellHideOnPhone}>
-          {patient.species}
+          {claim.species}
         </td>
       );
     }
@@ -179,26 +179,26 @@ export class PatientTable extends React.Component {
       );
     }
   }
-  renderSendButton(patient, avatarStyle){
+  renderSendButton(claim, avatarStyle){
     if (this.props.showSendButton === true) {
       return (
         <td className='sendButton' style={this.data.style.hideOnPhone}>
-          <FlatButton label="send" onClick={this.onSend.bind('this', this.data.patients[i]._id)}/>
+          <FlatButton label="send" onClick={this.onSend.bind('this', this.data.claims[i]._id)}/>
         </td>
       );
     }
   }
   onSend(id){
-    let patient = Patients.findOne({_id: id});
+    let claim = Claims.findOne({_id: id});
 
-    console.log("PatientTable.onSend()", patient);
+    console.log("ClaimTable.onSend()", claim);
 
     var httpEndpoint = "http://localhost:8080";
     if (get(Meteor, 'settings.public.interfaces.default.channel.endpoint')) {
       httpEndpoint = get(Meteor, 'settings.public.interfaces.default.channel.endpoint');
     }
-    HTTP.post(httpEndpoint + '/Patient', {
-      data: patient
+    HTTP.post(httpEndpoint + '/Claim', {
+      data: claim
     }, function(error, result){
       if (error) {
         console.log("error", error);
@@ -208,34 +208,34 @@ export class PatientTable extends React.Component {
       }
     });
   }
-  selectPatientRow(patientId){
+  selectClaimRow(claimId){
     if(typeof(this.props.onRowClick) === "function"){
-      this.props.onRowClick(patientId);
+      this.props.onRowClick(claimId);
     }
   }
   render () {
     let tableRows = [];
     let footer;
 
-    if(this.data.patients.length === 0){
+    if(this.data.claims.length === 0){
       footer = <TableNoData noDataPadding={ this.props.noDataMessagePadding } />
     } else {
-      for (var i = 0; i < this.data.patients.length; i++) {
+      for (var i = 0; i < this.data.claims.length; i++) {
         tableRows.push(
-          <tr key={i} className="patientRow" style={{cursor: "pointer"}} onClick={this.selectPatientRow.bind(this, this.data.patients[i].id )} >
+          <tr key={i} className="claimRow" style={{cursor: "pointer"}} onClick={this.selectClaimRow.bind(this, this.data.claims[i].id )} >
   
-            { this.renderRowAvatar(this.data.patients[i], this.data.style.avatar) }
+            { this.renderRowAvatar(this.data.claims[i], this.data.style.avatar) }
   
-            <td className='identifier' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].identifier}</td>
-            <td className='name' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].name }</td>
-            <td className='gender' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cell}>{this.data.patients[i].gender}</td>
-            <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.patients[i].birthDate }</td>
-            <td className='maritalStatus' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].maritalStatus}</td>
-            <td className='language' style={this.data.style.cellHideOnPhone}>{this.data.patients[i].language}</td>
-            <td className='isActive' onClick={ this.rowClick.bind('this', this.data.patients[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.patients[i].active}</td>
+            <td className='identifier' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].identifier}</td>
+            <td className='name' onClick={ this.rowClick.bind('this', this.data.claims[i]._id)} style={this.data.style.cell}>{this.data.claims[i].name }</td>
+            <td className='gender' onClick={ this.rowClick.bind('this', this.data.claims[i]._id)} style={this.data.style.cell}>{this.data.claims[i].gender}</td>
+            <td className='birthDate' onClick={ this.rowClick.bind('this', this.data.claims[i]._id)} style={{minWidth: '100px', paddingTop: '16px'}}>{this.data.claims[i].birthDate }</td>
+            <td className='maritalStatus' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].maritalStatus}</td>
+            <td className='language' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].language}</td>
+            <td className='isActive' onClick={ this.rowClick.bind('this', this.data.claims[i]._id)} style={this.data.style.cellHideOnPhone}>{this.data.claims[i].active}</td>
 
-              { this.renderSpeciesRow(this.props.displaySpecies, this.data.patients[i]) }
-              { this.renderSendButton(this.data.patients[i], this.data.style.avatar) }
+              { this.renderSpeciesRow(this.props.displaySpecies, this.data.claims[i]) }
+              { this.renderSendButton(this.data.claims[i], this.data.style.avatar) }
           </tr>
         );
       }
@@ -245,7 +245,7 @@ export class PatientTable extends React.Component {
 
     return(
       <div>
-        <Table id='patientsTable' hover >
+        <Table id='claimsTable' hover >
           <thead>
             <tr>
               { this.renderRowAvatarHeader() }
@@ -272,7 +272,7 @@ export class PatientTable extends React.Component {
   }
 }
 
-PatientTable.propTypes = {
+ClaimTable.propTypes = {
   id: PropTypes.string,
   fhirVersion: PropTypes.string,
   showSendButton: PropTypes.bool,
@@ -280,5 +280,5 @@ PatientTable.propTypes = {
   noDataMessagePadding: PropTypes.number
 };
 
-ReactMixin(PatientTable.prototype, ReactMeteorData);
-export default PatientTable;
+ReactMixin(ClaimTable.prototype, ReactMeteorData);
+export default ClaimTable;
