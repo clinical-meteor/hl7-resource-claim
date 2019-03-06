@@ -1,43 +1,31 @@
 
 
-// import ClaimDetail from './client/ClaimDetail.js';
-// import ClaimPickList from './client/ClaimPickList.js';
-// import ClaimsPage from './client/ClaimsPage.js';
-// import ClaimTable from './client/ClaimTable.js';
-// import { insertClaim, removeClaimById, updateClaim } from './lib/methods.js';
-
 import ClaimsPage from './client/ClaimsPage';
-import ClaimTable from './client/ClaimTable';
-import {ClaimTable as ClaimsTable} from './client/ClaimTable';
+import ClaimsTable from './client/ClaimsTable';
 import ClaimDetail from './client/ClaimDetail';
-import ClaimCard from './client/ClaimCard';
 
 import { Claim, Claims, ClaimSchema } from './lib/Claims';
 
 var DynamicRoutes = [{
   'name': 'ClaimPage',
-  'path': '/patients',
+  'path': '/claims',
   'component': ClaimsPage,
   'requireAuth': true
 }];
 
-// var DynamicRoutes = [];
-
-var SidebarElements = [{
+var AdminSidebarElements = [{
   'primaryText': 'Claims',
-  'to': '/patients',
-  'href': '/patients'
+  'to': '/claims',
+  'href': '/claims'
 }];
 
 export { 
-  SidebarElements, 
+  AdminSidebarElements, 
   DynamicRoutes, 
 
   ClaimsPage,
-  ClaimTable,
   ClaimsTable,
   ClaimDetail,
-  ClaimCard,
 
   Claim,
   Claims,

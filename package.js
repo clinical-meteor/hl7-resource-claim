@@ -1,6 +1,6 @@
 Package.describe({
   name: 'clinical:hl7-resource-claim',
-  version: '3.4.18',
+  version: '3.5.1',
   summary: 'HL7 FHIR Resource - Claim',
   git: 'https://github.com/clinical-meteor/hl7-resource-claim',
   documentation: 'README.md'
@@ -14,7 +14,7 @@ Package.onUse(function (api) {
   api.use('mongo');
 
   api.use('aldeed:collection2@3.0.0');
-  api.use('clinical:hl7-resource-datatypes@4.0.0');
+  api.use('clinical:hl7-resource-datatypes@4.0.4');
   api.use('clinical:hl7-resource-bundle@1.4.0');
 
   api.use('simple:json-routes@2.1.0');
@@ -24,7 +24,7 @@ Package.onUse(function (api) {
   api.use('http');
   api.use('react-meteor-data@0.2.15');
 
-  api.use('clinical:glass-ui@2.2.1');
+  api.use('clinical:glass-ui@2.4.4');
   api.use('clinical:extended-api@2.2.2');
   api.use('clinical:base-model@1.4.0');
   api.use('clinical:user-model@1.6.2');
@@ -34,10 +34,10 @@ Package.onUse(function (api) {
   api.imply('clinical:user-model');
 
   api.addFiles('lib/Claims.js');
+  api.addFiles('lib/methods.js', ['client', 'server']);
 
-  api.addFiles('server/methods.js', 'server');
+  api.addFiles('server/hooks.js', 'server');
   api.addFiles('server/rest.js', 'server');
-  // api.addFiles('server/hooks.patients.js', 'server');
 
   if(Package['clinical:fhir-vault-server']){
     api.use('clinical:fhir-vault-server@0.0.3', ['client', 'server'], {weak: true});
@@ -46,8 +46,6 @@ Package.onUse(function (api) {
   api.export('Claim');
   api.export('Claims');
   api.export('ClaimSchema');
-
-  api.addFiles('assets/noAvatar.png', "client", {isAsset: true});    
 
   api.mainModule('index.jsx', 'client');
 });

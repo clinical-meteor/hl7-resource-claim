@@ -42,87 +42,38 @@ export class ClaimDetail extends React.Component {
     this.state = {
       claimId: false,
       claim: {
-        resourceType : 'Claim',
-        name : [{
-          text : '',
-          prefix: [''],
-          family: [''],
-          given: [''],
-          suffix: [''],
-          resourceType : 'HumanName'
-        }],
-        active : true,
-        gender : "",
-        birthDate : '',
-        photo : [{
-          url: ""
-        }],
-        identifier: [{
-          use: 'usual',
-          type: {
-            coding: [
-              {
-                system: 'http://hl7.org/fhir/v2/0203',
-                code: 'MR'
-              }
-            ]
-          },
-          value: ''
-        }],
-        deceasedBoolean: false,
-        multipleBirthBoolean: false,
-        maritalStatus: {
-          text: ''
-        },
-        contact: [],
-        animal: {
-          species: {
-            text: 'Human'
-          }
-        },
-        communication: [{
-          language: {
-            text: 'English'
-          }
-        }],
-        careProvider: [{
-          display: '',
-          reference: ''
-        }],
-        managingOrganization: {
-          reference: '',
-          display: ''
-        }
+        created: '',
+        diagnosis: '',
+        identifier: '',
+        insurance: '',
+        insurer: '',
+        patient: '',
+        provider: '',
+        unitprice: ''
       },
       form: {
-        prefix: '',
-        family: '',
-        given: '',
-        suffix: '',
+        created: '',
+        diagnosis: '',
         identifier: '',
-        deceased: false,
-        multipleBirth: false,
-        maritalStatus: '',
-        species: '',
-        language: ''
+        insurance: '',
+        insurer: '',
+        patient: '',
+        provider: '',
+        unitprice: ''
       }
     }
   }
   dehydrateFhirResource(claim) {
     let formData = Object.assign({}, this.state.form);
 
-    formData.prefix = get(claim, 'name[0].prefix[0]')
-    formData.family = get(claim, 'name[0].family[0]')
-    formData.given = get(claim, 'name[0].given[0]')
-    formData.suffix = get(claim, 'name[0].suffix[0]')
-    formData.identifier = get(claim, 'identifier[0].value')
-    formData.deceased = get(claim, 'deceasedBoolean')
-    formData.gender = get(claim, 'gender')
-    formData.multipleBirth = get(claim, 'multipleBirthBoolean')
-    formData.maritalStatus = get(claim, 'maritalStatus.text')
-    formData.species = get(claim, 'animal.species.text')
-    formData.language = get(claim, 'communication[0].language.text')
-    formData.birthDate = moment(claim.birthDate).format("YYYY-MM-DD")
+    formData.created = moment(get(claim, 'created')).format('YYYY-MM-DD');
+    formData.diagnosis = get(claim, 'diagnosis[0].diagnosisCodeableConcept.coding[0].code', '');
+    formData.identifier = get(claim, 'identifier[0].value', '');
+    formData.insurance = get(claim, 'insurance[0].coverage.reference', '');
+    formData.insurer = get(claim, 'insurer.reference', '');
+    formData.patient = get(claim, 'patient.reference', '');
+    formData.provider = get(claim, 'provider.reference', '');
+    formData.unitprice = get(claim, 'item[0].unitPrice.value', '').toString();
 
     return formData;
   }
@@ -174,64 +125,68 @@ export class ClaimDetail extends React.Component {
       <div id={this.props.id} className="claimDetail">
         <CardText>
           <Row>
-            <Col md={4}>
+            <Col md={3}>
+              <TextField
+                id='createdInput'
+                ref='created'
+                name='created'
+                type='date'
+                floatingLabelText='Created'
+                value={ get(formData, 'created', '')}
+                onChange={ this.changeState.bind(this, 'created')}
+                floatingLabelFixed={true}
+                fullWidth
+                /><br/>
+            </Col>
+            <Col md={3}>
               <TextField
                 id='mrnInput'
                 ref='identifier'
                 name='identifier'
-                floatingLabelText='Identifier (Medical Record Number)'
+                floatingLabelText='Identifier'
                 value={ get(formData, 'identifier', '')}
                 onChange={ this.changeState.bind(this, 'identifier')}
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
             </Col>
-            <Col md={3} mdOffset={5}>
-              <br />
-              <Toggle
-                label="Deceased"
-                labelPosition="right"
-                defaultToggled={false}
-                style={styles.toggle}
-              />
-            </Col>
           </Row>
           <Row>
-            <Col md={1}>
+            <Col md={3}>
               <TextField
-                id='prefixInput'
-                ref='prefix'
-                name='prefix'
-                floatingLabelText='Prefix'
-                value={ get(formData, 'prefix', '')}
-                onChange={ this.changeState.bind(this, 'prefix')}
+                id='insuranceInput'
+                ref='insurance'
+                name='insurance'
+                floatingLabelText='Insurance'
+                value={ get(formData, 'insurance', '')}
+                onChange={ this.changeState.bind(this, 'insurance')}
                 hintText=''
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
             </Col>
-            <Col md={5}>
+            <Col md={3}>
               <TextField
-                id='givenInput'
-                ref='given'
-                name='given'
-                floatingLabelText='Given Name'
+                id='insurerInput'
+                ref='insurer'
+                name='insurer'
+                floatingLabelText='Insurer'
                 hintText='Jane'
-                value={ get(formData, 'given', '')}
-                onChange={ this.changeState.bind(this, 'given')}
+                value={ get(formData, 'insurer', '')}
+                onChange={ this.changeState.bind(this, 'insurer')}
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
             </Col>
             <Col md={3}>
               <TextField
-                id='familyInput'
-                ref='family'
-                name='family'
-                floatingLabelText='Family Name'
+                id='patientInput'
+                ref='patient'
+                name='patient'
+                floatingLabelText='Patient'
                 hintText='Doe'
-                value={ get(formData, 'family', '')}
-                onChange={ this.changeState.bind(this, 'family')}
+                value={ get(formData, 'patient', '')}
+                onChange={ this.changeState.bind(this, 'patient')}
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
@@ -239,13 +194,13 @@ export class ClaimDetail extends React.Component {
             </Col>
             <Col md={3}>
               <TextField
-                id='suffixInput'
-                ref='suffix'
-                name='suffix'
-                floatingLabelText='Suffix / Maiden'
+                id='ProviderInput'
+                ref='Provider'
+                name='Provider'
+                floatingLabelText='Provider'
                 hintText=''
-                value={ get(formData, 'suffix', '')}
-                onChange={ this.changeState.bind(this, 'suffix')}
+                value={ get(formData, 'Provider', '')}
+                onChange={ this.changeState.bind(this, 'Provider')}
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>
@@ -254,94 +209,14 @@ export class ClaimDetail extends React.Component {
           <Row>
             <Col md={3}>
               <TextField
-                id='maritalStatusInput'
-                ref='maritalStatus'
-                name='maritalStatus'
-                floatingLabelText='Marital Status'
-                hintText='single | maried | other'
-                value={ get(formData, 'maritalStatus', '')}
-                onChange={ this.changeState.bind(this, 'maritalStatus')}
+                id='unitPriceInput'
+                ref='unitPrice'
+                name='unitPrice'
+                floatingLabelText='Unit Price'
+                hintText='$'
+                value={ get(formData, 'unitPrice', '')}
+                onChange={ this.changeState.bind(this, 'unitPrice')}
                 floatingLabelFixed={false}
-                floatingLabelFixed={true}
-                fullWidth
-                /><br/>
-            </Col>
-            <Col md={3}>
-              <TextField
-                id='genderInput'
-                ref='gender'
-                name='gender'
-                floatingLabelText='Gender'
-                hintText='male | female | unknown'
-                value={ get(formData, 'gender', '')}
-                onChange={ this.changeState.bind(this, 'gender')}
-                floatingLabelFixed={true}
-                fullWidth
-                /><br/>
-            </Col>
-            <Col md={3}>
-              {/* <br />
-              { this.renderDatePicker(true, get(formData, 'birthDate') ) } */}
-
-              <TextField
-                id='birthDateInput'
-                ref='birthDate'
-                name='birthDate'
-                type='date'
-                floatingLabelText='Birthdate'
-                // hintText='YYYY-MM-DD'
-                value={ get(formData, 'birthDate', '')}
-                onChange={ this.changeState.bind(this, 'birthDate')}
-                floatingLabelFixed={true}
-                fullWidth
-                /><br/>
-            </Col>
-            <Col md={3} >
-              <br />
-              <Toggle
-                label="Multiple Birth"
-                defaultToggled={false}
-                labelPosition="right"
-                style={styles.toggle}
-              />              
-            </Col>
-          </Row>
-          <Row>
-            <Col md={6}>
-              <TextField
-                id='photoInput'
-                ref='photo'
-                name='photo'
-                floatingLabelText='Photo'
-                hintText='http://somewhere.com/image.jpg'
-                value={ get(formData, 'photo', '')}
-                onChange={ this.changeState.bind(this, 'photo')}
-                floatingLabelFixed={true}
-                fullWidth
-                /><br/>
-            </Col>
-            <Col md={3}>
-              <TextField
-                id='speciesInput'
-                ref='species'
-                name='species'
-                floatingLabelText='Species'
-                value={ get(formData, 'species', '')}
-                hintText='Human'
-                onChange={ this.changeState.bind(this, 'species')}
-                floatingLabelFixed={true}
-                fullWidth
-                /><br/>
-            </Col>
-            <Col md={3}>
-              <TextField
-                id='languageInput'
-                ref='language'
-                name='language'
-                floatingLabelText='Language'
-                value={ get(formData, 'language', '')}
-                onChange={ this.changeState.bind(this, 'language')}
-                hintText='English'
                 floatingLabelFixed={true}
                 fullWidth
                 /><br/>

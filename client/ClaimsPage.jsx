@@ -3,7 +3,7 @@ import { Tab, Tabs } from 'material-ui/Tabs';
 import { Glass, GlassCard, VerticalCanvas, FullPageCanvas } from 'meteor/clinical:glass-ui';
 
 import ClaimDetail from './ClaimDetail';
-import ClaimTable from './ClaimTable';
+import ClaimsTable from './ClaimsTable';
 import React from 'react';
 import { ReactMeteorData } from 'meteor/react-meteor-data';
 import ReactMixin from 'react-mixin';
@@ -72,7 +72,7 @@ export class ClaimsPage extends React.Component {
     console.log('React.version: ' + React.version);
     return (
       <div id="claimsPage">
-        <VerticalCanvas>
+        <FullPageCanvas>
           <GlassCard height="auto">
             <CardTitle
               title="Claims"
@@ -85,7 +85,7 @@ export class ClaimsPage extends React.Component {
                       id='newClaim' />
                  </Tab>
                  <Tab className="claimListTab" label='Claims' onActive={this.handleActive} style={this.data.style.tab} value={1}>
-                   <ClaimTable 
+                   <ClaimsTable 
                       showBarcodes={true} 
                       showAvatars={true} 
                       noDataMessagePadding={100}
@@ -104,7 +104,7 @@ export class ClaimsPage extends React.Component {
 
             </CardText>
           </GlassCard>
-        </VerticalCanvas>
+        </FullPageCanvas>
       </div>
     );
   }
