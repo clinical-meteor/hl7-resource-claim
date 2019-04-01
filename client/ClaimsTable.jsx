@@ -218,7 +218,7 @@ export class ClaimsTable extends React.Component {
             <td className='insurer' onClick={ this.rowClick.bind('this', this.data.claims[i]._id)} style={this.data.style.cell}>{this.data.claims[i].insurer}</td>
             <td className='patient' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].patient}</td>
             <td className='provider' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].provider}</td>
-            <td className='unitprice' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].unitprice}</td>
+            <td className='unitprice' style={this.data.style.cellHideOnPhone}>{"$" + this.data.claims[i].unitprice}</td>
             <td className='itemcount' style={this.data.style.cellHideOnPhone}>{this.data.claims[i].itemcount}</td>
 
               { this.renderSendButton(this.data.claims[i], this.data.style.avatar) }
