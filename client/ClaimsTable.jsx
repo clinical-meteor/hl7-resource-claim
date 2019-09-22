@@ -231,7 +231,7 @@ export class ClaimsTable extends React.Component {
 
     return(
       <div>
-        <Table id='claimsTable' hover >
+        <Table id='claimsTable' hover style={{position: 'sticky', top: '0px'}}>
           <thead>
             <tr>
               <th className='created' style={{minWidth: '100px'}}>Created</th>
